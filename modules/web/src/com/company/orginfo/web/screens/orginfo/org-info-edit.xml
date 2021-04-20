@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
+        caption="msg://orgInfoEdit.caption"
+        focusComponent="form"
+        messagesPack="com.company.orginfo.web.screens.orginfo">
+    <data>
+        <instance id="orgInfoDc"
+                  class="com.company.orginfo.entity.OrgInfo">
+            <view extends="_local"/>
+            <loader/>
+        </instance>
+    </data>
+    <dialogMode height="600"
+                width="800" forceDialog="true" resizable="true" />
+    <layout expand="editActions" spacing="true" >
+        <form id="form" dataContainer="orgInfoDc" width="100%">
+            <column width="350px">
+                <textField id="orgNameField" property="orgName"/>
+                <textField id="orgCodeField" property="orgCode"/>
+                <textField id="orgTypeField" property="orgType"/>
+                <textField id="orgHeadEmailField" property="orgHeadEmail"/>
+            </column>
+        </form>
+        <hbox id="editActions" spacing="true">
+            <button id="commitAndCloseBtn" action="windowCommitAndClose"/>
+            <button id="closeBtn" action="windowClose"/>
+        </hbox>
+    </layout>
+</window>
