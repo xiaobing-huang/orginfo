@@ -1,0 +1,1 @@
+drop table if exists ORGINFO_ORG_INFO_TOTAL__U62103 cascade ;

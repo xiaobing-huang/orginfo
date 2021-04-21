@@ -1,5 +1,7 @@
 package com.company.orginfo.entity;
 
+import com.haulmont.chile.core.annotations.MetaClass;
+import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.StandardEntity;
 
 import javax.persistence.Column;

@@ -3,5 +3,6 @@
     <persistence-unit name="orginfo" transaction-type="RESOURCE_LOCAL">
 
         <class>com.company.orginfo.entity.OrgInfo</class>
+        <class>com.company.orginfo.entity.OrgInfoTotalVIew</class>
     </persistence-unit>
 </persistence>

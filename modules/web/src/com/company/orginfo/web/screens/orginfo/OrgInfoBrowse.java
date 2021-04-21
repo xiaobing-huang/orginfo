@@ -1,12 +1,16 @@
 package com.company.orginfo.web.screens.orginfo;
 
+import com.company.orginfo.entity.OrgInfoTotalVIew;
 import com.company.orginfo.service.OrgInfoImporterService;
+import com.haulmont.charts.gui.components.charts.Chart;
 import com.haulmont.cuba.core.entity.BaseGenericIdEntity;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.gui.Dialogs;
+import com.haulmont.cuba.gui.RemoveOperation;
 import com.haulmont.cuba.gui.Screens;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.Button;
+import com.haulmont.cuba.gui.components.Filter;
 import com.haulmont.cuba.gui.model.CollectionLoader;
 import com.haulmont.cuba.gui.screen.*;
 import com.company.orginfo.entity.OrgInfo;
@@ -50,7 +54,10 @@ public class OrgInfoBrowse extends StandardLookup<OrgInfo> {
 
     private List<BaseGenericIdEntity> orgInfoList = new ArrayList<>();
     private OrgInfo orgInfo;
-
+    @Inject
+    private Filter filter;
+    @Inject
+    private CollectionLoader<OrgInfoTotalVIew> orgInfoTotalLoader;
 
 
     @Subscribe("btnImport")
@@ -86,6 +93,7 @@ public class OrgInfoBrowse extends StandardLookup<OrgInfo> {
             jsonArray.forEach(orginfo -> parseOrgInfo((JSONObject) orginfo));
             orgInfoImporterService.doImport(orgInfoList);
             orgInfoesDl.load();
+            orgInfoTotalLoader.load();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (ParseException e) {
@@ -125,12 +133,41 @@ public class OrgInfoBrowse extends StandardLookup<OrgInfo> {
             if(orgInfoList.size() > 0){
                 orgInfoImporterService.doImport(orgInfoList);
                 orgInfoesDl.load();
+                orgInfoTotalLoader.load();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Subscribe("pieChart")
+    public void onPieChartSlicePullOut(Chart.SlicePullOutEvent event) {
+       String orgType = event.getDataItem().getValue("orgType").toString();
+       orgInfoesDl.setParameter("orgType", orgType);
+       orgInfoesDl.load();
+    }
+
+    @Subscribe("pieChart")
+    public void onPieChartSlicePullIn(Chart.SlicePullInEvent event) {
+       orgInfoesDl.removeParameter("orgType");
+       orgInfoesDl.load();
+    }
+
+    @Install(to = "orgInfoesTable.remove", subject = "afterActionPerformedHandler")
+    private void orgInfoesTableRemoveAfterActionPerformedHandler(RemoveOperation.AfterActionPerformedEvent<OrgInfo> afterActionPerformedEvent) {
+       orgInfoTotalLoader.load();
+    }
+
+    @Install(to = "orgInfoesTable.edit", subject = "afterCommitHandler")
+    private void orgInfoesTableEditAfterCommitHandler(OrgInfo orgInfo) {
+        orgInfoTotalLoader.load();
+    }
+
+    @Install(to = "orgInfoesTable.create", subject = "afterCommitHandler")
+    private void orgInfoesTableCreateAfterCommitHandler(OrgInfo orgInfo) {
+       orgInfoTotalLoader.load();
     }
 
 }

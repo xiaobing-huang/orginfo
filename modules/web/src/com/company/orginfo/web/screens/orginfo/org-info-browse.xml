@@ -1,54 +1,88 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
         xmlns:c="http://schemas.haulmont.com/cuba/screen/jpql_condition.xsd"
+        xmlns:chart="http://schemas.haulmont.com/charts/charts.xsd"
         caption="msg://orgInfoBrowse.caption"
         focusComponent="orgInfoesTable"
         messagesPack="com.company.orginfo.web.screens.orginfo">
     <data readOnly="true">
+        <collection id="orgInfoTotalDc" class="com.company.orginfo.entity.OrgInfoTotalVIew" view="_local">
+            <loader id="orgInfoTotalLoader">
+                <query>
+                    <![CDATA[ select e from orginfo_OrgInfoTotalView e]]>
+                </query>
+            </loader>
+        </collection>
         <collection id="orgInfoesDc"
                     class="com.company.orginfo.entity.OrgInfo">
             <view extends="_local"/>
             <loader id="orgInfoesDl">
                 <query>
                     <![CDATA[select e from orginfo_OrgInfo e]]>
+                    <condition>
+                        <and>
+                            <c:jpql>
+                                <c:where>e.orgType=:orgType</c:where>
+                            </c:jpql>
+                        </and>
+                    </condition>
                 </query>
             </loader>
         </collection>
     </data>
     <dialogMode height="600"
                 width="800"/>
-    <layout expand="orgInfoesTable"
-            spacing="true">
-        <filter id="filter"
-                applyTo="orgInfoesTable"
-                dataLoader="orgInfoesDl">
-            <properties include=".*"/>
-        </filter>
-        <groupTable id="orgInfoesTable"
-                    width="100%"
-                    dataContainer="orgInfoesDc">
-            <actions>
-                <action id="create" type="create"/>
-                <action id="edit" type="edit"/>
-                <action id="remove" type="remove"/>
-                <action id="refresh" type="refresh"/>
-            </actions>
-            <columns>
-                <column id="orgName"/>
-                <column id="orgCode"/>
-                <column id="orgType"/>
-                <column id="orgHeadEmail"/>
-            </columns>
-            <rowsCount/>
-            <buttonsPanel id="buttonsPanel"
-                          alwaysVisible="true">
-                <button id="createBtn" action="orgInfoesTable.create"/>
-                <button id="editBtn" action="orgInfoesTable.edit"/>
-                <button id="removeBtn" action="orgInfoesTable.remove"/>
-                <button id="refreshBtn" action="orgInfoesTable.refresh"/>
-                <button id="btnImport" icon="icons/wf-design-import.png" />
-            </buttonsPanel>
-        </groupTable>
+    <layout spacing="true">
+        <split >
+            <hbox height="AUTO">
+                <chart:pieChart id="pieChart"
+                                titleField="id"
+                                valueField="totalCount" dataContainer="orgInfoTotalDc" theme="LIGHT"/>
+                <chart:serialChart categoryField="orgType"
+                                   dataContainer="orgInfoTotalDc" theme="LIGHT" >
+                    <chart:graphs>
+                        <chart:graph valueField="totalCount"
+                                     balloonText="[[value]]" type="COLUMN" fillAlphas="0.9" lineAlpha="0.2">
+                        </chart:graph>
+                    </chart:graphs>
+                    <chart:categoryAxis dashLength="1"
+                                        minorGridEnabled="true"/>
+                </chart:serialChart>
+            </hbox>
+            <vbox spacing="true">
+                <filter id="filter"
+                        applyTo="orgInfoesTable"
+                        dataLoader="orgInfoesDl" margin="true;false;true;false">
+                    <properties include=".*" excludeProperties="id,version,createTs,createdBy,updateTs,updatedBy,deleteTs,deletedBy"
+                    />
+                </filter>
+                <groupTable id="orgInfoesTable"
+                            width="100%"
+                            dataContainer="orgInfoesDc">
+                    <actions>
+                        <action id="create" type="create"/>
+                        <action id="edit" type="edit"/>
+                        <action id="remove" type="remove"/>
+                        <action id="refresh" type="refresh"/>
+                    </actions>
+                    <columns>
+                        <column id="orgName"/>
+                        <column id="orgCode"/>
+                        <column id="orgType"/>
+                        <column id="orgHeadEmail"/>
+                    </columns>
+                    <rowsCount/>
+                    <buttonsPanel id="buttonsPanel"
+                                  alwaysVisible="true">
+                        <button id="createBtn" action="orgInfoesTable.create"/>
+                        <button id="editBtn" action="orgInfoesTable.edit"/>
+                        <button id="removeBtn" action="orgInfoesTable.remove"/>
+                        <button id="refreshBtn" action="orgInfoesTable.refresh"/>
+                        <button id="btnImport" icon="icons/wf-design-import.png"/>
+                    </buttonsPanel>
+                </groupTable>
+            </vbox>
+        </split>
         <hbox id="lookupActions" spacing="true" visible="false">
             <button action="lookupSelectAction"/>
             <button action="lookupCancelAction"/>
